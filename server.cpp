@@ -7,7 +7,8 @@
 #include <string.h>
 
 const char* host = "0.0.0.0";
-int port = 7000;
+#define port 7000
+#define Maxlen 4096
 
 int main()
 {
@@ -15,7 +16,7 @@ int main()
     socklen_t addrlen;
     struct sockaddr_in my_addr, client_addr;
     int status;
-    char indata[1024] = {0}, outdata[1280] = {0};
+    char indata[Maxlen] = {0}, outdata[Maxlen] = {0};
     int on = 1;
 
     // create a socket
@@ -67,7 +68,7 @@ int main()
             indata[nbytes] = '\0';
             printf("recv: %s\n", indata);
 
-            sprintf(outdata, "echo %s", indata);
+            sprintf(outdata, "%s", indata);
             send(new_fd, outdata, strlen(outdata), 0);
         }
     }

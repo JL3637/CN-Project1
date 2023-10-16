@@ -8,14 +8,15 @@
 #include <string.h>
 
 const char* host = "0.0.0.0";
-int port = 7000;
+#define port 7000
+#define Maxlen 4096
 
 int main()
 {
     int sock_fd;
     struct sockaddr_in serv_name;
     int status;
-    char indata[1024] = {0}, outdata[1024] = {0};
+    char indata[Maxlen] = {0}, outdata[Maxlen] = {0};
 
     // create a socket
     sock_fd = socket(AF_INET, SOCK_STREAM, 0);
