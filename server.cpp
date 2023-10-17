@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char* host = "127.0.0.1";
+const char* host = "0.0.0.0";
 #define port 7000
 #define Maxlen 4096
 
