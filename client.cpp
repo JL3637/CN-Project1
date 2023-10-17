@@ -1,4 +1,3 @@
-// g++ cpp-linux-tcp-socket-client.cpp -o client
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -7,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char* host = "0.0.0.0";
+const char* host = "127.0.0.1";
 #define port 7000
 #define Maxlen 4096
 
