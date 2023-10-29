@@ -23,6 +23,9 @@ int main(){
     inet_aton(host, &server_addr.sin_addr);
     server_addr.sin_port = htons(port);
 
+    int on = 1;
+    socklen_t client_addrlen = sizeof(client_addr);
+    setsockopt(server_sock_fd, SOL_SOCKET, SO_REUSEADDR, &on, client_addrlen);
     status = bind(server_sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if (status == -1) {
         perror("Binding error");
@@ -36,8 +39,6 @@ int main(){
         exit(1);
     }
     printf("wait for connection...\n");
-
-    socklen_t client_addrlen = sizeof(client_addr);
 
     char buf_in[Maxlen] = {0}, buf_out[Maxlen] = {0};
     while (1) {
