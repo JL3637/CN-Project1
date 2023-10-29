@@ -1,2 +1,2 @@
-g++ client.cpp -o server
+g++ client.cpp -o client
 ./client
