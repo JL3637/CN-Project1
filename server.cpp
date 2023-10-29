@@ -11,26 +11,26 @@ const char* host = "0.0.0.0";
 #define Maxlen 4096
 
 int main(){
-    int host_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (host_sock_fd == -1) {
+    int server_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_sock_fd == -1) {
         perror("Socket creation error");
         exit(1);
     }
-    struct sockaddr_in host_addr, client_addr;
+    struct sockaddr_in server_addr, client_addr;
     int status;
 
-    host_addr.sin_family = AF_INET;
-    inet_aton(host, &host_addr.sin_addr);
-    host_addr.sin_port = htons(port);
+    server_addr.sin_family = AF_INET;
+    inet_aton(host, &server_addr.sin_addr);
+    server_addr.sin_port = htons(port);
 
-    status = bind(host_sock_fd, (struct sockaddr *)&host_addr, sizeof(host_addr));
+    status = bind(server_sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if (status == -1) {
         perror("Binding error");
         exit(1);
     }
-    printf("server start at: %s:%d\n", inet_ntoa(host_addr.sin_addr), port);
+    printf("server start at: %s:%d\n", inet_ntoa(server_addr.sin_addr), port);
 
-    status = listen(host_sock_fd, 5);
+    status = listen(server_sock_fd, 5);
     if (status == -1) {
         perror("Listening error");
         exit(1);
@@ -41,7 +41,7 @@ int main(){
 
     char buf_in[Maxlen] = {0}, buf_out[Maxlen] = {0};
     while (1) {
-        int client_sock_fd = accept(host_sock_fd, (struct sockaddr *)&client_addr, &client_addrlen);
+        int client_sock_fd = accept(server_sock_fd, (struct sockaddr *)&client_addr, &client_addrlen);
         printf("Connected by %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
         while (1) {
             int buf_len = recv(client_sock_fd, buf_in, sizeof(buf_in), 0);
@@ -57,7 +57,7 @@ int main(){
             send(client_sock_fd, buf_out, strlen(buf_out), 0);
         }
     }
-    close(host_sock_fd);
+    close(server_sock_fd);
 
     return 0;
 }
