@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char* host = "127.0.0.1";
+const char* host = "0.0.0.0";
 #define port 7000
 #define Maxlen 4096
 
@@ -55,8 +55,7 @@ int main()
 
     while (1) {
         new_fd = accept(sock_fd, (struct sockaddr *)&client_addr, &addrlen);
-        printf("connected by %s:%d\n", inet_ntoa(client_addr.sin_addr),
-            ntohs(client_addr.sin_port));
+        printf("connected by %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
         while (1) {
             int nbytes = recv(new_fd, indata, sizeof(indata), 0);
