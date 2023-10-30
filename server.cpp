@@ -10,68 +10,55 @@ const char* host = "0.0.0.0";
 #define port 7000
 #define Maxlen 4096
 
-int main()
-{
-    int sock_fd, new_fd;
-    socklen_t addrlen;
-    struct sockaddr_in my_addr, client_addr;
-    int status;
-    char indata[Maxlen] = {0}, outdata[Maxlen] = {0};
-    int on = 1;
-
-    // create a socket
-    sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock_fd == -1) {
+int main(){
+    int server_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_sock_fd == -1) {
         perror("Socket creation error");
         exit(1);
     }
+    struct sockaddr_in server_addr, client_addr;
+    int status;
 
-    // for "Address already in use" error message
-    if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int)) == -1) {
-        perror("Setsockopt error");
-        exit(1);
-    }
+    server_addr.sin_family = AF_INET;
+    inet_aton(host, &server_addr.sin_addr);
+    server_addr.sin_port = htons(port);
 
-    // server address
-    my_addr.sin_family = AF_INET;
-    inet_aton(host, &my_addr.sin_addr);
-    my_addr.sin_port = htons(port);
-
-    status = bind(sock_fd, (struct sockaddr *)&my_addr, sizeof(my_addr));
+    int on = 1;
+    setsockopt(server_sock_fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+    status = bind(server_sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if (status == -1) {
         perror("Binding error");
         exit(1);
     }
-    printf("server start at: %s:%d\n", inet_ntoa(my_addr.sin_addr), port);
+    printf("server start at: %s:%d\n", inet_ntoa(server_addr.sin_addr), port);
 
-    status = listen(sock_fd, 5);
+    status = listen(server_sock_fd, 5);
     if (status == -1) {
         perror("Listening error");
         exit(1);
     }
     printf("wait for connection...\n");
 
-    addrlen = sizeof(client_addr);
-
+    socklen_t client_addrlen = sizeof(client_addr);
+    char buf_in[Maxlen] = {0}, buf_out[Maxlen] = {0};
     while (1) {
-        new_fd = accept(sock_fd, (struct sockaddr *)&client_addr, &addrlen);
-        printf("connected by %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-
+        int client_sock_fd = accept(server_sock_fd, (struct sockaddr *)&client_addr, &client_addrlen);
+        printf("Connected by %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
         while (1) {
-            int nbytes = recv(new_fd, indata, sizeof(indata), 0);
-            if (nbytes <= 0) {
-                close(new_fd);
-                printf("client closed connection.\n");
+            int buf_len = recv(client_sock_fd, buf_in, sizeof(buf_in), 0);
+            if (buf_len <= 0) {
+                close(client_sock_fd);
+                printf("Client closed connection.\n");
                 break;
             }
-            indata[nbytes] = '\0';
-            printf("recv: %s\n", indata);
+            buf_in[buf_len] = '\0';
+            printf("Server recv: %s\n", buf_in);
 
-            sprintf(outdata, "%s", indata);
-            send(new_fd, outdata, strlen(outdata), 0);
+            sprintf(buf_out, "%s", buf_in);
+            send(client_sock_fd, buf_out, strlen(buf_out), 0);
         }
     }
-    close(sock_fd);
+    close(server_sock_fd);
 
     return 0;
 }
